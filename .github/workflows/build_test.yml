@@ -2,50 +2,30 @@ name: Build and test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build_test_project1:
-
+  build_test:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v4
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Run Project1 tests
-      run: dotnet test TestProject1/TestProject1.csproj --no-build --verbosity normal
-
-
-  build_test_project2:
-
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - TestProject1/TestProject1.csproj
+          - TestProject2/TestProject2.csproj
+          - TestProject3/TestProject3.csproj
 
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v4
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Run Project2 tests
-      run: dotnet test TestProject2/TestProject2.csproj --no-build --verbosity normal
+      - name: Checkout the code
+        uses: actions/checkout@v4
 
-  build_test_project3:
+      - name: Restore dependencies
+        run: dotnet restore
 
-    runs-on: ubuntu-latest
+      - name: Build
+        run: dotnet build --no-restore
 
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v4
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Run Project3 tests
-      run: dotnet test TestProject3/TestProject3.csproj --no-build --verbosity normal
+      - name: Run tests
+        run: dotnet test ${{ matrix.project }} --no-build --verbosity normal
